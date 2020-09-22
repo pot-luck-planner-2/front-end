@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import {useHistory} from 'react-router-dom';
 import axios from 'axios';
 import * as yup from 'yup';
-import { Button, Form, FormGroup, Label, Input, FormFeedback, Alert } from 'reactstrap';
+import { Button, Form, FormGroup, Label, Input, FormFeedback, Alert, Spinner } from 'reactstrap';
 
 const formSchema = yup.object().shape(
     {
@@ -30,6 +30,7 @@ const LoginForm = () => {
 
     const [buttonDisabled, setButtonDisabled] = useState(true);
     const [serverError, setServerError] = useState('');
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         formSchema.isValid(formState)
@@ -59,19 +60,29 @@ const LoginForm = () => {
     };
 
     const handleSubmit = e => {
+        setLoading(true);
         setServerError('');
         e.preventDefault();
         axios.post('https://prettypoppinpotlucks.herokuapp.com/api/login', formState)
         .then((res) => {
             console.log(res);
 
-            localStorage.set('token', res.data.token)
+            window.localStorage.setItem('token', res.data.token)
             history.push('/')
         })
         .catch((err) => {
-            if(err.response.status === 401){
-                setServerError('Invalid credentials, please try again.');
-            }
+            setLoading(false);
+            if(err && err.response && err.response.status){
+                console.log(err.response);
+                if(err.response.status === 401){
+                    setServerError('Invalid credentials, please try again.');
+                }
+                if(err.response.status === 500){
+                    setServerError('Issue connecting to server, try again later.');
+                }
+            }else{
+                console.log(err);
+            }  
         });
     };
 
@@ -117,7 +128,11 @@ const LoginForm = () => {
                             <FormFeedback>{errorState.password}</FormFeedback>
                         ) : null}
                     </FormGroup>        
-                    <Button disabled={buttonDisabled}>Sign in</Button>
+                    <Button disabled={buttonDisabled}>
+                        Sign in 
+                        {loading && <Spinner color="primary" size='sm' style={{ marginLeft: '10px' }}/>}
+                    </Button>
+                    
                 </Form>
             </div>
         </div>

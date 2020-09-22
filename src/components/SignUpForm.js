@@ -1,6 +1,8 @@
 import React, {useState, useEffect} from 'react';
 import * as yup from 'yup';
 import axios from 'axios';
+import { useHistory } from 'react-router-dom';
+import { Button, Form, FormGroup, Label, Input, FormFeedback, Alert, Spinner } from 'reactstrap';
 
 const formSchema = yup.object().shape({
     name: yup
@@ -26,6 +28,8 @@ const formSchema = yup.object().shape({
 });
 
 const SignUpForm = () => {
+    const history = useHistory();
+
     const [formState, setFormState] = useState({
         email: '',
         name: '',
@@ -35,6 +39,8 @@ const SignUpForm = () => {
     })
 
     const [buttonDisabled, setButtonDisabled] = useState(true);
+    const [serverError, setServerError] = useState('');
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         formSchema.isValid(formState)
@@ -62,7 +68,7 @@ const SignUpForm = () => {
                 });
             })
             .catch((err) => {
-                console.log(err.errors);
+                // console.log(err.errors);
                 setErrorState({
                     ...errorState,
                     [e.target.name]: err.errors[0],
@@ -80,69 +86,112 @@ const SignUpForm = () => {
     };
 
     const handleSubmit = e => {
+        setLoading(true);
+        setServerError('');
         e.preventDefault();
         console.log(formState);
         axios
             .post('https://prettypoppinpotlucks.herokuapp.com/api/register', formState)
-            .then((res) => console.log(res))
-            .catch((err) => console.log(err))
+            .then(() => {
+                history.pushState('/login');
+            })
+            .catch((err) => {
+                setLoading(false);
+                console.log(err.response);
+                if(err.response.status === 409){
+                    setServerError(err.response.data.message);
+                }
+                if(err.response.status === 500){
+                    setServerError('Issue connecting to server, try again later.');
+                }
+            })
     }
 
     return (
-        <div>
-            <form onSubmit={handleSubmit}>
-            <label htmlFor='name'>Name:</label>
-                <input
-                    id='name'
-                    type='text'
-                    name='name'
-                    value= {formState.name}
-                    onChange={handleChange}
-                    placeholder='Name'
-                />
-                {errorState.name.length > 0 ? <p>{errorState.name}</p> : null}
-                <label htmlFor='username'>Username:</label>
-                <input
-                    id='username'
-                    type='text'
-                    name='username'
-                    value= {formState.username}
-                    onChange={handleChange}
-                    placeholder='Username'
-                />
-                {errorState.username.length > 0 ? <p>{errorState.username}</p> : null}
-                <label htmlFor='name'>Email:</label>
-                <input
-                    id='email'
-                    type='text'
-                    name='email'
-                    value= {formState.email}
-                    onChange={handleChange}
-                    placeholder='Email'
-                />
-                {errorState.name.length > 0 ? <p>{errorState.name}</p> : null}
-                <label htmlFor='password'>Password:</label>
-                <input
-                    id='password'
-                    type='password'
-                    name='password'
-                    value= {formState.password}
-                    onChange={handleChange}
-                    placeholder='Password'
-                />
-                {errorState.password.length > 0 ? <p>{errorState.password}</p> : null}
-                <label htmlFor='phone'>Phone Number:</label>
-                <input
-                    id='phone'
-                    type='tel'
-                    name='phone'
-                    value= {formState.phone}
-                    onChange={handleChange}
-                    placeholder='Phone'
-                />
-                {errorState.password.length > 0 ? <p>{errorState.password}</p> : null}
-                <button id='submit' disabled={buttonDisabled}>Register</button>
-            </form>
+        <div style={{ margin: '0 auto', width: '100%', height: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+            <div style={{ width: '500px' }}>
+                {serverError && <Alert color='danger'>{serverError}</Alert>}
+                <Form onSubmit={handleSubmit}>
+                    <FormGroup>
+                        <Label for="name">Name</Label>
+                        <Input 
+                            type="text" 
+                            name="name" 
+                            id="name" 
+                            placeholder="ex. John Doe" 
+                            onChange={handleChange}
+                            value={formState.name}
+                            invalid={errorState.name.length > 0}
+                        />
+                        {errorState.name.length > 0 ? (
+                            <FormFeedback>{errorState.name}</FormFeedback>
+                        ) : null}
+                    </FormGroup>
+                    <FormGroup>
+                        <Label for="username">Username</Label>
+                        <Input 
+                            type="text" 
+                            name="username" 
+                            id="username" 
+                            placeholder="ex. johndoe"
+                            onChange={handleChange}
+                            value={formState.username}
+                            invalid={errorState.username.length > 0}
+                        />
+                        {errorState.username.length > 0 ? (
+                            <FormFeedback>{errorState.username}</FormFeedback>
+                        ) : null}
+                    </FormGroup>
+                    <FormGroup>
+                        <Label for="email">Email</Label>
+                        <Input 
+                            type="email" 
+                            name="email" 
+                            id="email" 
+                            placeholder="example@email.com" 
+                            onChange={handleChange}
+                            value={formState.email}
+                            invalid={errorState.email.length > 0}
+                        />
+                        {errorState.email.length > 0 ? (
+                            <FormFeedback>{errorState.email}</FormFeedback>
+                        ) : null}
+                    </FormGroup>
+                    <FormGroup>
+                        <Label for="password">Password</Label>
+                        <Input 
+                            type="password" 
+                            name="password" 
+                            id="password"
+                            onChange={handleChange}
+                            value={formState.password}
+                            invalid={errorState.password.length > 0}                
+                        />
+                        {errorState.password.length > 0 ? (
+                            <FormFeedback>{errorState.password}</FormFeedback>
+                        ) : null}
+                    </FormGroup>
+                    <FormGroup>
+                        <Label for="phone">Phone Number</Label>
+                        <Input 
+                            type="tel" 
+                            name="phone" 
+                            id="phone" 
+                            placeholder="123-456-9999" 
+                            onChange={handleChange}
+                            value={formState.phone}
+                            invalid={errorState.phone.length > 0}
+                        />
+                        {errorState.phone.length > 0 ? (
+                            <FormFeedback>{errorState.phone}</FormFeedback>
+                        ) : null}
+                    </FormGroup>
+                    <Button disabled={buttonDisabled}>
+                        Submit
+                        {loading && <Spinner color="primary" size='sm' style={{ marginLeft: '10px' }}/>}
+                    </Button>                    
+                </Form>
+            </div>
         </div>
     );
 };
