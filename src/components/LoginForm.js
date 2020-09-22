@@ -1,18 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {useHistory} from 'react-router-dom';
 import axios from 'axios';
 import * as yup from 'yup';
+import { Button, Form, FormGroup, Label, Input, FormFeedback, Alert, Spinner } from 'reactstrap';
 
 const formSchema = yup.object().shape(
     {
         username: yup
             .string()
-            .required('Must be a valid username')
-            .min(6,'Username is required'),
+            .required('Username is required'),
         password: yup
             .string()
             .required('Password is required')
-            .min(6, 'Password is too short'),
     }
 );
 
@@ -29,7 +28,18 @@ const LoginForm = () => {
         password: '',
     }); 
 
-    const validate = e => {
+    const [buttonDisabled, setButtonDisabled] = useState(true);
+    const [serverError, setServerError] = useState('');
+    const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+        formSchema.isValid(formState)
+            .then(valid => {
+                setButtonDisabled(!valid);
+            });
+    }, [formState]);
+
+    const validateChange= e => {
         e.persist();
         yup 
             .reach(formSchema, e.target.name)
@@ -50,51 +60,81 @@ const LoginForm = () => {
     };
 
     const handleSubmit = e => {
+        setLoading(true);
+        setServerError('');
         e.preventDefault();
-        axios
-            .post('https://prettypoppinpotlucks.herokuapp.com/api/login', formState)
-            .then((res) => {
-                console.log(res);
+        axios.post('https://prettypoppinpotlucks.herokuapp.com/api/login', formState)
+        .then((res) => {
+            console.log(res);
 
-                localStorage.set('token', res.data.token)
-                history.push('/')
-            })
-            .catch((err) => console.log(err));
+            window.localStorage.setItem('token', res.data.token)
+            history.push('/')
+        })
+        .catch((err) => {
+            setLoading(false);
+            if(err && err.response && err.response.status){
+                console.log(err.response);
+                if(err.response.status === 401){
+                    setServerError('Invalid credentials, please try again.');
+                }
+                if(err.response.status === 500){
+                    setServerError('Issue connecting to server, try again later.');
+                }
+            }else{
+                console.log(err);
+            }  
+        });
     };
 
     const handleChange = e => {
+        e.persist();
+        validateChange(e);
         setFormState({
             ...formState,
             [e.target.name]: e.target.value,
         });
-        validate(e);
     };
 
     return (
-        <div>
-            <form onSubmit={handleSubmit}>
-                <label htmlFor='username'>Username:</label>
-                <input
-                    id='username'
-                    type='text'
-                    name='username'
-                    value= {formState.username}
-                    onChange={handleChange}
-                    placeholder='Username'
-                />
-                {errorState.username.length > 0 ? <p>{errorState.username}</p> : null}
-                <label htmlFor='password'>Password:</label>
-                <input
-                    id='password'
-                    type='password'
-                    name='password'
-                    value= {formState.password}
-                    onChange={handleChange}
-                    placeholder='Password'
-                />
-                {errorState.password.length > 0 ? <p>{errorState.password}</p> : null}
-                <button>Login</button>
-            </form>
+        <div style={{ margin: '0 auto', width: '100%', height: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+            <div style={{ width: '500px' }}>
+                {serverError && <Alert color='danger'>{serverError}</Alert>}
+                <Form onSubmit={handleSubmit}>
+                    <FormGroup>
+                        <Label for="username">Username</Label>
+                        <Input 
+                            type="text" 
+                            name="username" 
+                            id="username"
+                            value={formState.username}
+                            onChange={handleChange}
+                            invalid={errorState.username.length > 0}
+                        />
+                        {errorState.username.length > 0 ? (
+                            <FormFeedback>{errorState.username}</FormFeedback>
+                        ) : null}
+                    </FormGroup>
+                    <FormGroup>
+                        <Label for="examplePassword">Password</Label>
+                        <Input 
+                            type="password" 
+                            name="password" 
+                            id="examplePassword"
+                            value={formState.password}
+                            onChange={handleChange}
+                            invalid={errorState.password.length > 0}
+                        />
+                        {errorState.password.length > 0 ? (
+                            <FormFeedback>{errorState.password}</FormFeedback>
+                        ) : null}
+                    </FormGroup>        
+                    <Button disabled={buttonDisabled}>
+                        Sign in 
+                        {loading && <Spinner color="primary" size='sm' style={{ marginLeft: '10px' }}/>}
+                    </Button>
+                    
+                </Form>
+            </div>
         </div>
     );
 };
