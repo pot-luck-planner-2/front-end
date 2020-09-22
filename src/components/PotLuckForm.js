@@ -17,14 +17,14 @@ const PotLuckForm = () => {
         name: '',
         location: '',
         date: '',
-        id: Date.now()
+        host_id: ''
     });
 
     const [errorState, setErrorState] = useState({
         name: '',
         location: '',
         date: '',
-        id: ''
+        host_id: ''
     });
 
     const [buttonDisabled, setButtonDisabled] = useState(true);
@@ -59,14 +59,7 @@ const PotLuckForm = () => {
         console.log('created a new potluck')
 
         axioswithAuth()
-        .get('/potlucks')
-        .then((res) => {
-            setPotLuckState(res.data);
-        })
-        .catch((err) => console.log(err))
-
-        axioswithAuth()
-        .post('/potlucks', { ...potLuckState })
+        .post('/potlucks', potLuckState)
         .then((res) => {
             setPotLuckState(res.data);
         })
