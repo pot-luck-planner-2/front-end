@@ -97,12 +97,16 @@ const SignUpForm = () => {
             })
             .catch((err) => {
                 setLoading(false);
-                console.log(err.response);
-                if(err.response.status === 409){
-                    setServerError(err.response.data.message);
-                }
-                if(err.response.status === 500){
-                    setServerError('Issue connecting to server, try again later.');
+                if(err && err.response && err.response.status){
+                    console.log(err.response);
+                    if(err.response.status === 409){
+                        setServerError(err.response.data.message);
+                    }
+                    if(err.response.status === 500){
+                        setServerError('Issue connecting to server, try again later.');
+                    }
+                }else{
+                    console.log(err);
                 }
             })
     }
