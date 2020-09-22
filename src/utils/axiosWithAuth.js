@@ -10,3 +10,5 @@ export const axioswithAuth = () => {
         }
     });
 };
+
+export default axioswithAuth;

@@ -5,6 +5,7 @@ import axios from 'axios';
 
 import LoginForm from './components/LoginForm.js';
 import SignUpForm from './components/SignUpForm.js';
+import PotLuckForm from './components/PotLuckForm.js';
 
 import './App.css';
 
@@ -18,6 +19,7 @@ function App () {
         <Route path='/register'>
           <SignUpForm/>
         </Route>
+        <PrivateRoute exact path='/potluck-form' component={ PotLuckForm }/>
       </Switch>
     </Router>
   );
