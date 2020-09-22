@@ -98,6 +98,5 @@ const LoginForm = () => {
         </div>
     );
 };
-//hello random comment
 
 export default LoginForm;

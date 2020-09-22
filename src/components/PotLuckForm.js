@@ -57,7 +57,21 @@ const PotLuckForm = () => {
     const formSubmit = e => {
         e.preventDefault();
         console.log('created a new potluck')
-    }
+
+        axioswithAuth()
+        .get('/potlucks')
+        .then((res) => {
+            setPotLuckState(res.data);
+        })
+        .catch((err) => console.log(err))
+
+        axioswithAuth()
+        .post('/potlucks', { ...potLuckState })
+        .then((res) => {
+            setPotLuckState(res.data);
+        })
+        .catch((err) => console.log(err))
+    };
 
     const handleChange = e => {
         e.persist();
