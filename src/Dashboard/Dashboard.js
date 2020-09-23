@@ -9,17 +9,13 @@ import { Dashboard } from './styles';
 export default () => {
     const [currentView, setCurrentView] = useState('home');
 
-    useEffect(() => {
-        console.log(currentView);
-    }, [currentView]);
-
     return (
         <Dashboard>
             <SideBar
                 currentView={currentView}
                 setCurrentView={setCurrentView}
             />
-            {currentView === 'home' && <Welcome/>}
+            {currentView === 'home' && <Welcome setCurrentView={setCurrentView}/>}
             {currentView === 'create' && <PotLuckForm/>}
         </Dashboard>
     );
