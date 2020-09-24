@@ -68,7 +68,7 @@ const LoginForm = () => {
             console.log(res);
 
             window.localStorage.setItem('token', res.data.token)
-            history.push('/')
+            history.push('/dashboard')
         })
         .catch((err) => {
             setLoading(false);
