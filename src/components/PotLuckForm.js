@@ -13,18 +13,20 @@ const formSchema = yup.object().shape({
 });
 
 const PotLuckForm = () => {
+    const id = localStorage.getItem('userID');
+
     const [potLuckState, setPotLuckState] = useState({
         name: '',
         location: '',
         date: '',
-        host_id: ''
+        host_id: Number
     });
 
     const [errorState, setErrorState] = useState({
         name: '',
         location: '',
         date: '',
-        host_id: ''
+        host_id: Number
     });
 
     const [buttonDisabled, setButtonDisabled] = useState(true);
@@ -59,7 +61,7 @@ const PotLuckForm = () => {
         console.log('created a new potluck')
 
         axioswithAuth()
-        .post('/potlucks', potLuckState)
+        .post('/api/potlucks', potLuckState)
         .then((res) => {
             setPotLuckState(res.data);
         })
@@ -85,7 +87,7 @@ const PotLuckForm = () => {
                     />
                     { errorState.name.length > 0 ? <p>{ errorState.name }</p> : null}
                 </label>
-                <label>Location - Identify where the potluck will be located (i.e Davidson, North Carolina).
+                <label>Location - Enter the address of the potluck.
                     <input 
                         type='text'
                         name='location'
@@ -116,7 +118,7 @@ const PotLuckForm = () => {
 export default PotLuckForm;
 
 const PotLuck = styled.div`
-    background-color: green;
+    background-color: lightblue;
     margin: 1rem;
     border: .2rem solid black;
     border-radius: .5rem;
@@ -143,11 +145,11 @@ const PotLuck = styled.div`
 
     button {
         background-color: white;
-        color: green;
+        color: black;
         font-size: 1rem;
         font-weight: bolder;
         border: .2rem solid black;
-        border-radius: .2rem;
+        border-radius: .5rem;
         max-width: 25vw;
         margin: .5rem;
         padding: .5rem;

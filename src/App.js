@@ -6,22 +6,29 @@ import axios from 'axios';
 import LoginForm from './components/LoginForm.js';
 import SignUpForm from './components/SignUpForm.js';
 import PotLuckForm from './components/PotLuckForm.js';
+import UpdatingPotLuck from './components/UpdatingPotluck.js';
+import PotLuckContext from './contexts/PotLuckContext.js';
 
 import './App.css';
 
 function App () {
+  const [potLucks, setPotLucks] = useState([]);
+
   return (
-    <Router>
-      <Switch>
-        <Route path='/login'>
-          <LoginForm/>
-        </Route>
-        <Route path='/register'>
-          <SignUpForm/>
-        </Route>
-        <PrivateRoute exact path='/potluck-form' component={ PotLuckForm }/>
-      </Switch>
-    </Router>
+    <PotLuckContext.Provider value= {{potLucks, setPotLucks}}>
+      <Router>
+        <Switch>
+          <Route path='/login'>
+            <LoginForm/>
+          </Route>
+          <Route path='/register'>
+            <SignUpForm/>
+          </Route>
+          <PrivateRoute exact path='/potluck-form' component={ PotLuckForm }/>
+          <PrivateRoute path='/edit-potluck' component={ UpdatingPotLuck }/>
+        </Switch>
+      </Router>
+    </PotLuckContext.Provider>
   );
 }
 
