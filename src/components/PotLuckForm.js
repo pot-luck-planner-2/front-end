@@ -13,20 +13,22 @@ const formSchema = yup.object().shape({
 });
 
 const PotLuckForm = () => {
-    const id = localStorage.getItem('userID');
+    const host_id = window.localStorage.getItem('UserID');
 
     const [potLuckState, setPotLuckState] = useState({
         name: '',
         location: '',
         date: '',
-        host_id: Number
+        host_id: host_id
     });
+
+    potLuckState.date =  potLuckState.date.split('T')[0];
 
     const [errorState, setErrorState] = useState({
         name: '',
         location: '',
         date: '',
-        host_id: Number
+        host_id: host_id
     });
 
     const [buttonDisabled, setButtonDisabled] = useState(true);
@@ -69,6 +71,7 @@ const PotLuckForm = () => {
     };
 
     const handleChange = e => {
+
         e.persist();
         validate(e);
         setPotLuckState({ ...potLuckState, [e.target.name]: e.target.value});
@@ -77,6 +80,7 @@ const PotLuckForm = () => {
     return (
         <PotLuck>
             <form onSubmit={ formSubmit }>
+                <h2>Create a Potluck</h2>
                 <label>Name - Add a memorable name to your potluck.
                     <input 
                         type='text'
@@ -123,6 +127,10 @@ const PotLuck = styled.div`
     border: .2rem solid black;
     border-radius: .5rem;
 
+    h2 {
+        text-align: center;
+    }
+
     form  {
         display: flex;
         flex-direction: column;
@@ -153,6 +161,5 @@ const PotLuck = styled.div`
         max-width: 25vw;
         margin: .5rem;
         padding: .5rem;
-
     }
 `
