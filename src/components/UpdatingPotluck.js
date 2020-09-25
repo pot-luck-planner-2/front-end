@@ -133,6 +133,7 @@ const Container = styled.div`
     display: flex: 
     flex-direction: row;
     flex-wrap: wrap;
+    max-width: 70vw;
 `
 
 const EditForm = styled.div`
@@ -181,12 +182,19 @@ const EditForm = styled.div`
 const Potluck = styled.div`
         display: flex;
         flex-direction: column;
-        width: 50vw;
-        float: left;
         align-items: center;
+        float: left;
 
         h3, h4 {
             text-align: center;
+        }
+
+        h3 {
+            font-size: 1.2rem;
+        }
+
+        h4 {
+            font-size: 1rem;
         }
 
         div {
@@ -196,8 +204,8 @@ const Potluck = styled.div`
             justify-content: center;
             border: .2rem solid black;
             border-radius: .5rem;
-            min-width: 40vw;
-            max-width: 40vw;
+            min-width: 30vw;
+            max-width: 30vw;
             margin: 1rem;
             padding: 1rem;
         }
