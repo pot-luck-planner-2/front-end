@@ -4,13 +4,19 @@ import PrivateRoute from './components/PrivateRoute.js';
 
 import LoginForm from './components/LoginForm.js';
 import SignUpForm from './components/SignUpForm.js';
+
+import UpdatingPotLuck from './components/UpdatingPotluck.js';
+import PotLuckContext from './contexts/PotLuckContext.js';
 import Dashboard from './Dashboard/Dashboard';
 
 import './App.css';
 
 function App () {
+  const [potLucks, setPotLucks] = useState([]);
+
   return (
-    <Router>
+    <PotLuckContext.Provider value= {{potLucks, setPotLucks}}>
+      <Router>
         <Route path='/login'>
           <LoginForm/>
         </Route>
@@ -18,7 +24,9 @@ function App () {
           <SignUpForm/>
         </Route>
         <PrivateRoute exact path='/dashboard' component={ Dashboard }/>
-    </Router>
+        <PrivateRoute path='/edit-potluck' component={ UpdatingPotLuck }/>
+      </Router>
+    </PotLuckContext.Provider>
   );
 }
 

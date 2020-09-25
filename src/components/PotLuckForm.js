@@ -13,18 +13,22 @@ const formSchema = yup.object().shape({
 });
 
 const PotLuckForm = () => {
+    const host_id = window.localStorage.getItem('UserID');
+
     const [potLuckState, setPotLuckState] = useState({
         name: '',
         location: '',
         date: '',
-        host_id: ''
+        host_id: host_id
     });
+
+    potLuckState.date =  potLuckState.date.split('T')[0];
 
     const [errorState, setErrorState] = useState({
         name: '',
         location: '',
         date: '',
-        host_id: ''
+        host_id: host_id
     });
 
     const [buttonDisabled, setButtonDisabled] = useState(true);
@@ -59,7 +63,7 @@ const PotLuckForm = () => {
         console.log('created a new potluck')
 
         axioswithAuth()
-        .post('/potlucks', potLuckState)
+        .post('/api/potlucks', potLuckState)
         .then((res) => {
             setPotLuckState(res.data);
         })
@@ -67,6 +71,7 @@ const PotLuckForm = () => {
     };
 
     const handleChange = e => {
+
         e.persist();
         validate(e);
         setPotLuckState({ ...potLuckState, [e.target.name]: e.target.value});
@@ -75,6 +80,7 @@ const PotLuckForm = () => {
     return (
         <PotLuck>
             <form onSubmit={ formSubmit }>
+                <h2>Create a Potluck</h2>
                 <label>Name - Add a memorable name to your potluck.
                     <input 
                         type='text'
@@ -85,7 +91,7 @@ const PotLuckForm = () => {
                     />
                     { errorState.name.length > 0 ? <p>{ errorState.name }</p> : null}
                 </label>
-                <label>Location - Identify where the potluck will be located (i.e Davidson, North Carolina).
+                <label>Location - Enter the address of the potluck.
                     <input 
                         type='text'
                         name='location'
@@ -116,10 +122,14 @@ const PotLuckForm = () => {
 export default PotLuckForm;
 
 const PotLuck = styled.div`
-    background-color: green;
+    background-color: lightblue;
     margin: 1rem;
     border: .2rem solid black;
     border-radius: .5rem;
+
+    h2 {
+        text-align: center;
+    }
 
     form  {
         display: flex;
@@ -143,14 +153,13 @@ const PotLuck = styled.div`
 
     button {
         background-color: white;
-        color: green;
+        color: black;
         font-size: 1rem;
         font-weight: bolder;
         border: .2rem solid black;
-        border-radius: .2rem;
+        border-radius: .5rem;
         max-width: 25vw;
         margin: .5rem;
         padding: .5rem;
-
     }
 `

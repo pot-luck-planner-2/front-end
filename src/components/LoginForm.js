@@ -68,6 +68,9 @@ const LoginForm = () => {
             console.log(res);
 
             window.localStorage.setItem('token', res.data.token)
+
+            window.localStorage.setItem('userID', res.data.userID)
+            history.push('/edit-potluck')
             history.push('/dashboard')
         })
         .catch((err) => {
